@@ -7,30 +7,40 @@ use systemstat::{ByteSize, Platform, System};
 fn main() {
     let sys = System::new();
 
+    // Debug stats
     println!("Debug:");
     let bat_score = score_bat(&sys);
     let mem_score = score_mem(&sys);
     let cpu_score = score_cpu(&sys);
+    uptime(&sys);
+    cpu_temp(&sys);
 
     let avg = [bat_score, mem_score, cpu_score];
     let sum: u32 = Iterator::sum(avg.iter());
     let avg = u32::from(sum) / (avg.len() as u32);
 
+    // Scores
     println!("\nScores:");
     println!("- Average Score: {}", name_score(&avg));
     println!("- Battery Score: {}", name_score(&bat_score));
     println!("- Memory Score:  {}", name_score(&mem_score));
     println!("- CPU Score:     {}", name_score(&cpu_score));
+}
 
-    // match sys.uptime() {
-    //     Ok(uptime) => println!("\nUptime: {:?}", uptime),
-    //     Err(x) => println!("\nUptime: error: {}", x),
-    // }
+// Simply print uptime and cpu temp for now
+// cpu tempt may not be supported for some OSes or Systems
+fn uptime(sys: &System) {
+    match sys.uptime() {
+        Ok(uptime) => println!("- Uptime: {:?}", uptime),
+        Err(x) => println!("- Uptime: error: {}", x),
+    }
+}
 
-    // match sys.cpu_temp() {
-    //     Ok(cpu_temp) => println!("\nCPU temp: {}", cpu_temp),
-    //     Err(x) => println!("\nCPU temp: {}", x),
-    // }
+fn cpu_temp(sys: &System) {
+    match sys.cpu_temp() {
+        Ok(cpu_temp) => println!("- CPU temp: {}", cpu_temp),
+        Err(x) => println!("- CPU Temp: Error: {}", x),
+    }
 }
 
 fn score_bat(sys: &System) -> u32 {
