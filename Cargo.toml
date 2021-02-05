@@ -1,7 +1,8 @@
 [package]
 name = "howami"
 description = "Ask your computer not just whoami, but howami."
-version = "0.1.0"
+version = "0.1.1"
+repository = "https://github.com/LeptoFlare/howami"
 authors = ["LeptoFlare", "YaBoiJD"]
 readme = "README.md"
 license-file = "LICENSE"
