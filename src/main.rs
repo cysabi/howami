@@ -12,8 +12,8 @@ fn main() {
     let bat_score = score_bat(&sys);
     let mem_score = score_mem(&sys);
     let cpu_score = score_cpu(&sys);
+    let temp_score = temp_score(&sys);
     uptime(&sys);
-    cpu_temp(&sys);
 
     let mut scores = vec![mem_score, cpu_score];
 
@@ -21,23 +21,30 @@ fn main() {
         scores.push(score);
     }
 
+    if let Some(score) = temp_score {
+        scores.push(score);
+    }
+
     let avg_score = Score::avg(&scores);
 
     // Scores
     println!("\nScores:");
-    println!("- Average Score: {}", avg_score.to_string());
+    println!("- Average Score:    {}", avg_score.to_string());
 
     if let Some(score) = bat_score {
-        println!("- Battery Score: {}", score.to_string());
+        println!("- Battery Score:    {}", score.to_string());
     }
 
-    println!("- Memory Score:  {}", mem_score.to_string());
-    println!("- CPU Score:     {}", cpu_score.to_string());
+    println!("- Memory Score:     {}", mem_score.to_string());
+    println!("- CPU Score:        {}", cpu_score.to_string());
+    
+    if let Some(score) = temp_score {
+        println!("- CPU TEMP Score:   {}", score.to_string());
+    }
 }
 
-// Simply print uptime and cpu temp for now
-// CPU temp may not be supported for some OSes or Systems
-// TODO:  Score uptime and cpu temps
+// Simply print uptime
+// TODO:  Score uptime
 fn uptime(sys: &System) {
     match sys.uptime() {
         Ok(uptime) => println!("- Uptime: {:?}", uptime),
@@ -45,10 +52,15 @@ fn uptime(sys: &System) {
     }
 }
 
-fn cpu_temp(sys: &System) {
+// CPU temp may not be supported for some OSes or Systems
+fn temp_score(sys: &System) -> Option<Score> {
     match sys.cpu_temp() {
-        Ok(cpu_temp) => println!("- CPU temp: {}", cpu_temp),
-        Err(x) => println!("- CPU Temp: Error: {}", x),
+        Ok(cpu_temp) => {
+            let temp = cpu_temp as u8;
+            println!("- CPU TEMP: {}", temp);
+            return Some(Score::from_temp(temp));
+        },
+        Err(_) => None,
     }
 }
 
@@ -94,12 +106,12 @@ fn score_mem(sys: &System) -> Score {
 
 #[derive(Clone, Copy)]
 enum Score {
-    Awful = 0,
-    Bad = 1,
-    Poor = 2,
-    Fair = 3,
-    Good = 4,
-    Perfect = 5,
+    Awful,
+    Bad,
+    Poor,
+    Fair,
+    Good,
+    Perfect,
 }
 
 impl Score {
@@ -113,6 +125,18 @@ impl Score {
             90..=100 => Score::Perfect,
             _ => panic!("Out of scoring range."),
         };
+    }
+
+    fn from_temp(temp: u8) -> Self {
+        return match temp {
+            0..=30 => Score::Perfect,
+            31..=45 => Score::Good,
+            46..=60 => Score::Fair,
+            61..=75 => Score::Poor,
+            76..=85 => Score::Bad,
+            86..=110 => Score::Awful,
+            _ => Score::Awful,
+        }
     }
 
     fn from_int(int: usize) -> Self {
