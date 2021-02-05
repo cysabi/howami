@@ -1,14 +1,13 @@
 # `howami`
-Ask your computer not just whoami, but howami.
-
-> Short Description
+> Ask your computer not just whoami, but howami.
 
 ![License][license-shield]
 ![Stars][stars-shield]
 # <!-- ![Banner](banner.png) -->
 
-Longer description.
-- Feature
+The always ask `whoami` but never `howami`... but that can change. This wonderful tool lets you check up on how your computer is doing, see it's overall health.
+- Check basic stats like cpu, memory, battery usage.
+- All displayed in english sentences.
 
 ## Usage
 1. To install the package, first make sure you have Rust installed.
