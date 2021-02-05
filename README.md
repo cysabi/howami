@@ -1,6 +1,7 @@
 # `howami`
 > Ask your computer not just whoami, but howami.
 
+[![crates.io][crates-shield]](https://crates.io/crates/howami)
 ![License][license-shield]
 ![Stars][stars-shield]
 # <!-- ![Banner](banner.png) -->
@@ -34,5 +35,6 @@ As always, distributed under the MIT license. See `LICENSE` for more information
 _[https://github.com/LeptoFlare/howami](https://github.com/LeptoFlare/howami)_
 
 <!-- markdown links & imgs -->
+[crates-shield]: https://img.shields.io/crates/v/howami.svg
 [stars-shield]: https://img.shields.io/github/stars/LeptoFlare/howami.svg?style=social
 [license-shield]: https://img.shields.io/github/license/LeptoFlare/howami.svg?style=flat
