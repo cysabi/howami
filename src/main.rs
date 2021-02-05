@@ -1,6 +1,6 @@
 extern crate systemstat;
 
-use std::{thread};
+use std::thread;
 use std::time::Duration;
 use systemstat::{ByteSize, Platform, System};
 
@@ -15,16 +15,24 @@ fn main() {
     uptime(&sys);
     cpu_temp(&sys);
 
-    let avg = [bat_score, mem_score, cpu_score];
-    let sum: u32 = Iterator::sum(avg.iter());
-    let avg = u32::from(sum) / (avg.len() as u32);
+    let mut scores = vec![mem_score, cpu_score];
+
+    if let Some(score) = bat_score {
+        scores.push(score);
+    }
+
+    let avg_score = Score::avg(&scores);
 
     // Scores
     println!("\nScores:");
-    println!("- Average Score: {}", name_score(&avg));
-    println!("- Battery Score: {}", name_score(&bat_score));
-    println!("- Memory Score:  {}", name_score(&mem_score));
-    println!("- CPU Score:     {}", name_score(&cpu_score));
+    println!("- Average Score: {}", avg_score.to_string());
+
+    if let Some(score) = bat_score {
+        println!("- Battery Score: {}", score.to_string());
+    }
+
+    println!("- Memory Score:  {}", mem_score.to_string());
+    println!("- CPU Score:     {}", cpu_score.to_string());
 }
 
 // Simply print uptime and cpu temp for now
@@ -43,62 +51,89 @@ fn cpu_temp(sys: &System) {
     }
 }
 
-fn score_bat(sys: &System) -> u32 {
+fn score_bat(sys: &System) -> Option<Score> {
     match sys.battery_life() {
         Ok(bat) => {
-            let bat = bat.remaining_capacity * 100.0;
+            let bat = (bat.remaining_capacity * 100.0) as u8;
             println!("- BAT: {}", bat); // DEBUG INFO
-            return get_score(&(bat as u32));
+            return Some(Score::from_u8(bat));
         }
-        Err(_) => panic!("Couldn't get Battery usage"),
+        Err(_) => None,
     }
 }
 
-fn score_cpu(sys: &System) -> u32 {
+fn score_cpu(sys: &System) -> Score {
     match sys.cpu_load_aggregate() {
         Ok(cpu) => {
             thread::sleep(Duration::from_secs(1));
             let cpu = cpu.done().unwrap();
-            println!("- CPU: {}", cpu.idle * 100.0); // DEBUG INFO
-            let cpu = (cpu.idle * 100.0) as u32;
+            let cpu_idle = (cpu.idle * 100.0) as u8;
+            println!("- CPU: {}", cpu_idle); // DEBUG INFO
 
-            return get_score(&cpu);
+            return Score::from_u8(cpu_idle);
         }
         Err(_) => panic!("Couldn't get CPU usage"),
     }
 }
 
-fn score_mem(sys: &System) -> u32 {
+fn score_mem(sys: &System) -> Score {
     match sys.memory() {
         Ok(mem) => {
-            println!("- MEM: {} / {}", ByteSize::b(mem.total.as_u64() - mem.free.as_u64()), mem.total); // DEBUG INFO
-            let mem = mem.free.as_u64() * 100 / mem.total.as_u64();
-            return get_score(&(mem as u32));
+            println!(
+                "- MEM: {} / {}",
+                ByteSize::b(mem.total.as_u64() - mem.free.as_u64()),
+                mem.total
+            ); // DEBUG INFO
+            let mem_usage = (mem.free.as_u64() * 100 / mem.total.as_u64()) as u8;
+            return Score::from_u8(mem_usage as u8);
         }
         Err(_) => panic!("Couldn't get Memory usage."),
     }
 }
 
-fn get_score(percent: &u32) -> u32 {
-    return match 100 - percent {
-        0..=10 => 1,   // Perfect
-        11..=33 => 2,  // Good
-        34..=50 => 3,  // Fair
-        51..=75 => 4,  // Poor
-        76..=90 => 5,  // Bad
-        91..=100 => 6, // Awful
-        _ => panic!("Out of scoring range."),
-    };
+#[derive(Clone, Copy)]
+enum Score {
+    Awful = 0,
+    Bad = 1,
+    Poor = 2,
+    Fair = 3,
+    Good = 4,
+    Perfect = 5,
 }
 
-fn name_score(score: &u32) -> String {
-    return match score {
-        1 => String::from("Perfect"),
-        2 => String::from("Good"),
-        3 => String::from("Fair"),
-        4 => String::from("Poor"),
-        5 => String::from("Bad"),
-        6 => String::from("Awful"),
-        _ => panic!("Out of scoring range."),
-    };
+impl Score {
+    fn from_u8(percent: u8) -> Self {
+        return match percent {
+            0..=9 => Score::Awful,
+            10..=24 => Score::Bad,
+            25..=49 => Score::Poor,
+            50..=66 => Score::Fair,
+            67..=89 => Score::Good,
+            90..=100 => Score::Perfect,
+            _ => panic!("Out of scoring range."),
+        };
+    }
+
+    fn to_string(self) -> String {
+        return match self {
+            Score::Awful => String::from("Awful"),
+            Score::Bad => String::from("Bad"),
+            Score::Poor => String::from("Poor"),
+            Score::Fair => String::from("Fair"),
+            Score::Good => String::from("Good"),
+            Score::Perfect => String::from("Perfect"),
+        };
+    }
+
+    fn avg(vec: &Vec<Self>) -> Self {
+        let mut sum = 0;
+
+        for u in vec {
+            sum += *u as usize;
+        }
+
+        let avg = sum / vec.len();
+
+        Score::from_u8(avg as u8)
+    }
 }
