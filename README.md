@@ -6,7 +6,7 @@
 ![Stars][stars-shield]
 # <!-- ![Banner](banner.png) -->
 
-The always ask `whoami` but never `howami`... but that can change. This wonderful tool lets you check up on how your computer is doing, see it's overall health.
+They always ask `whoami` but never `howami`... but that can change. This wonderful tool lets you check up on how your computer is doing, see it's overall health.
 - Check basic stats like cpu, memory, battery usage.
 - All displayed in english sentences.
 
