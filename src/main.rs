@@ -1,8 +1,8 @@
 extern crate systemstat;
 
-use std::thread;
+use std::{thread};
 use std::time::Duration;
-use systemstat::{Platform, System};
+use systemstat::{ByteSize, Platform, System};
 
 fn main() {
     let sys = System::new();
@@ -61,7 +61,7 @@ fn score_cpu(sys: &System) -> u32 {
 fn score_mem(sys: &System) -> u32 {
     match sys.memory() {
         Ok(mem) => {
-            println!("- MEM: {} / {}", mem.free, mem.total); // DEBUG INFO
+            println!("- MEM: {} / {}", ByteSize::b(mem.total.as_u64() - mem.free.as_u64()), mem.total); // DEBUG INFO
             let mem = mem.free.as_u64() * 100 / mem.total.as_u64();
             return get_score(&(mem as u32));
         }
