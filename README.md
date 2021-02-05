@@ -5,7 +5,7 @@ Ask your computer not just whoami, but howami.
 
 ![License][license-shield]
 ![Stars][stars-shield]
-# ![Banner](banner.png)
+# <!-- ![Banner](banner.png) -->
 
 Longer description.
 - Feature
