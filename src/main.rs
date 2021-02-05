@@ -36,7 +36,8 @@ fn main() {
 }
 
 // Simply print uptime and cpu temp for now
-// cpu tempt may not be supported for some OSes or Systems
+// CPU temp may not be supported for some OSes or Systems
+// TODO:  Score uptime and cpu temps
 fn uptime(sys: &System) {
     match sys.uptime() {
         Ok(uptime) => println!("- Uptime: {:?}", uptime),
@@ -56,7 +57,7 @@ fn score_bat(sys: &System) -> Option<Score> {
         Ok(bat) => {
             let bat = (bat.remaining_capacity * 100.0) as u8;
             println!("- BAT: {}", bat); // DEBUG INFO
-            return Some(Score::from_u8(bat));
+            return Some(Score::from_percent(bat));
         }
         Err(_) => None,
     }
@@ -70,7 +71,7 @@ fn score_cpu(sys: &System) -> Score {
             let cpu_idle = (cpu.idle * 100.0) as u8;
             println!("- CPU: {}", cpu_idle); // DEBUG INFO
 
-            return Score::from_u8(cpu_idle);
+            return Score::from_percent(cpu_idle);
         }
         Err(_) => panic!("Couldn't get CPU usage"),
     }
@@ -85,7 +86,7 @@ fn score_mem(sys: &System) -> Score {
                 mem.total
             ); // DEBUG INFO
             let mem_usage = (mem.free.as_u64() * 100 / mem.total.as_u64()) as u8;
-            return Score::from_u8(mem_usage as u8);
+            return Score::from_percent(mem_usage as u8);
         }
         Err(_) => panic!("Couldn't get Memory usage."),
     }
@@ -102,7 +103,7 @@ enum Score {
 }
 
 impl Score {
-    fn from_u8(percent: u8) -> Self {
+    fn from_percent(percent: u8) -> Self {
         return match percent {
             0..=9 => Score::Awful,
             10..=24 => Score::Bad,
@@ -111,6 +112,18 @@ impl Score {
             67..=89 => Score::Good,
             90..=100 => Score::Perfect,
             _ => panic!("Out of scoring range."),
+        };
+    }
+
+    fn from_int(int: usize) -> Self {
+        return match int {
+            0 => Score::Awful,
+            1 => Score::Bad,
+            2 => Score::Poor,
+            3 => Score::Fair,
+            4 => Score::Good,
+            5 => Score::Perfect,
+            _ => panic!("Unknown value: {}", int),
         };
     }
 
@@ -134,6 +147,6 @@ impl Score {
 
         let avg = sum / vec.len();
 
-        Score::from_u8(avg as u8)
+        Score::from_int(avg as usize)
     }
 }
