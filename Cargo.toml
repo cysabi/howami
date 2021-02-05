@@ -1,0 +1,11 @@
+[package]
+name = "howami"
+description = "Ask your computer not just whoami, but howami."
+version = "0.1.0"
+authors = ["LeptoFlare", "YaBoiJD"]
+readme = "README.md"
+license-file = "LICENSE"
+
+[dependencies]
+systemstat = "0.1.6"
+rand = "0.8.3"
