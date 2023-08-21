@@ -26,14 +26,6 @@ They always ask `whoami` but never `howami`... but that can change. This wonderf
 2. `cd howami`
 3. `cargo run`
 
----
-
-Contact me · [**@LeptoFlare**](https://github.com/LeptoFlare) · [lepto.tech](https://lepto.tech)
-
-As always, distributed under the MIT license. See `LICENSE` for more information.
-
-_[https://github.com/LeptoFlare/howami](https://github.com/LeptoFlare/howami)_
-
 <!-- markdown links & imgs -->
 [crates-shield]: https://img.shields.io/crates/v/howami.svg
 [stars-shield]: https://img.shields.io/github/stars/LeptoFlare/howami.svg?style=social
